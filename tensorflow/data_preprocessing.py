@@ -1,4 +1,4 @@
-import nltk
+nimport nltk
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 import pickle
