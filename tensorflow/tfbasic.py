@@ -13,4 +13,5 @@ with tf.Session() as sess:
 
 # out is now a python variable
 print(out)
+
 # print(sess.run(result)) out of session

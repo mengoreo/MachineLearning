@@ -1,0 +1,111 @@
+#+TITLE:    TensorFlow Guide
+#+AUTHOR:   Ethan Mengoreo
+#+EMAIL:    mengoreo@163.com
+#+STARTUP:  indent
+#+LANGUAGE: en
+#+OPTIONS:  toc:t num:0
+#+SETUPFILE: https://juicyiter.gitee.io/assets/mengoreo.setup
+
+* Basic Classification
+#+BEGIN_SRC python :results value :session :exports both
+  from __future__ import absolute_import, division, print_function
+
+  # import TensorFlow and tf.keras
+  import tensorflow as tf
+  from tensorflow import keras
+
+  # Helper libraries
+  import numpy as np
+  import matplotlib.pyplot as plt
+
+  print(tf.__version__)
+#+END_SRC
+
+#+RESULTS:
+
+#+BEGIN_SRC python :results output :session :exports both
+print(tf.__version__)
+#+END_SRC
+
+#+RESULTS:
+: 1.13.1
+
+** Import the Fashion MNIST
+#+BEGIN_SRC python :session :result value
+  fashion_mnist = keras.datasets.fashion_mnist
+  (train_images, train_labels), (test_images, test_labels) = fashion_mnist.load_data()
+#+END_SRC
+
+#+RESULTS:
+
+Class names:
+#+BEGIN_SRC python :session
+  class_name = ['T-shirt/top', 'Trouser', 'Pullover', 'Dress', 'Coat',
+                'Sandal', 'Shirt', 'Sneaker', 'Bag', 'Ankel boot']
+#+END_SRC
+
+#+RESULTS:
+
+** Preprocess the data
+
+#+BEGIN_SRC python :session :results output
+plt.figure()
+plt.imshow(train_images[3])
+plt.colorbar()
+plt.grid(False)
+plt.show()
+#+END_SRC
+
+#+RESULTS:
+
+
+#+BEGIN_SRC python :session :results value
+  train_images = train_images / 255.0
+  text_images = test_images / 255.0
+
+  plt.figure(figsize=(10, 10))
+
+  for i in range(25):
+      plt.subplot(5, 5, i+1)
+      plt.xticks([])
+      plt.yticks([])
+      plt.grid(False)
+      plt.imshow(train_images[i], cmap=plt.cm.binary)
+      plt.xlabel(class_name[train_labels[i]])
+
+  plt.show()
+#+END_SRC
+
+** Build the model
+
+*** Set up layers
+
+#+BEGIN_SRC python :session
+  model = keras.Sequential([
+      keras.layers.Flatten(input_shape=(28, 28)),
+      keras.layers.Dense(128, activation=tf.nn.relu),
+      keras.layers.Dense(10, activation=tf.nn.softmax)
+      ])
+
+#+END_SRC
+
+#+RESULTS:
+
+The first layer is the input layer, =tf.keras.Flatten=, which transforms the format of the images from a 2d-array ( of 28 by 28 pixels), to a 1d-array of 784 pixels. *This layers has no parameters to learn; it only reformats the data.
+
+The next two =tf.keras.layers.Dense= layers are *densely-connected, or fully-connected* neural layers. The first has 128 nodes (or neurons) and the second has 10 nodes, which returns an array of 10 probability scores that sum to 1. Each node contains a score that indicates the probability that the current image belongs to one of the 10 classes.
+
+*** Compile the model
+
+#+BEGIN_SRC python :session
+  model.compile(optimizer='adam',
+                loss='sparse_categorical_crossentropy',
+                metrics=['accuracy'])
+#+END_SRC
+
+#+RESULTS:
+
+** Train the model
+#+BEGIN_SRC python :session :results output
+  model.fit(train_images, train_labels, epochs=5)
+#+END_SRC
